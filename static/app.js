@@ -1,8 +1,34 @@
+var textbox = Vue.component('text-box',{
+  template:`<div class="message_body">
+  <div> <input v-model="message" placeholder="Enter a msg"/> </div>
+  <div style="margin-top: 10px;"> <input type="password" v-model="password" placeholder=""/> </div>
+  <div style="margin-top: 10px; float:right;"> <button v-on:click="send">Submit</button> </div>
+  </div>`,
+  data (){
+    return {
+      message: "Hello World",
+      password: "",
+      counter: 0,
+      ws: {}
+    }
+  },
+  methods: {
+    send: function(){
+      console.log("asdf");
+      var val = {
+        message: this.message, password: this.password
+      }
+      $.post("update/submit/",JSON.stringify(val),function(data){
+        console.log(data)
+      })
+    }
+  }
+})
 var msgbdy = Vue.component('message-body',{
   template:`<div class="message_body">{{msgtxt}}</div>`,
   data (){
     return {
-      msgtxt: "blkn",
+      msgtxt: "msg",
       ws: {}
     }
   },

@@ -48,7 +48,7 @@ func addClient(c *websocket.Conn) {
 
 func processMessages(c *websocket.Conn) {
 	defer closeClient(c)
-		sendUpdate(c)
+	sendUpdate(c)
 	for {
 		sendUpdate(c)
 		time.Sleep(1000 * time.Millisecond)
@@ -70,6 +70,10 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "index.html")
 }
 
+func UpdateHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "update.html")
+}
+
 func WriteJSON(w http.ResponseWriter, data interface{}) error {
 	w.Header().Set("Content-Type", "application/json")
 	b, err := json.MarshalIndent(data, "", " ")
@@ -81,30 +85,32 @@ func WriteJSON(w http.ResponseWriter, data interface{}) error {
 	return nil
 }
 
-func SetHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("%v",r)
+type Data struct {
+	Message   string `json: "message"`
+	Password  string `json: "password"`
 }
 
-func updateMessage(){
-	messages := [...]string{
-		"Ooowhee",
-		"It's a scorcher out there"}
-	i := 0
-	for {
-		time.Sleep(1000 * time.Millisecond)
-		i ++;
-		if(i >= len(messages)){
-			i = 0;
-		}
-		msg = messages[i]
+func SetHandler(w http.ResponseWriter, r *http.Request) {
+	test := Data{}
+	err := json.NewDecoder(r.Body).Decode(&test)
+	if(err != nil){
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Printf("%v",test.Password)
+	if(test.Password == "password"){
+		msg = test.Message
+		fmt.Println("good job")
 	}
 }
 
+
 func main() {
-	go updateMessage()
 	r := mux.NewRouter()
 	fs := http.FileServer(http.Dir("static"))
 	r.HandleFunc("/", IndexHandler).Methods("GET")
+	r.HandleFunc("/update", UpdateHandler).Methods("GET")
+	r.HandleFunc("/update/submit/", SetHandler).Methods("POST")
 
 	r.Handle("/static/app.js", http.StripPrefix("/static/", fs))
 	r.Handle("/static/styles.css", http.StripPrefix("/static/", fs))
