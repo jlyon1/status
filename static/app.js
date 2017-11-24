@@ -16,6 +16,18 @@ var msgbdy = Vue.component('message-body',{
 
 })
 
+Vue.component('json-card',{
+  props: ['json'],
+  template: `<div v-bind:style="cardStyle" class="card">
+  {{json}}
+  </div>`,
+  data (){
+    return{
+      cardStyle: {marginTop: "20px", float: "left",borderRadius:"5px",borderStyle:"solid",borderWidth:"1px",borderColor:"black",width:"200px",height:"200px"}
+    }
+  }
+})
+
 Vue.component("title-bar",{
   props: ['txt'],
   template: `<div v-bind:style=titleStyle><p v-bind:style=paragraphStyle>{{txt}}</p></div>`,
